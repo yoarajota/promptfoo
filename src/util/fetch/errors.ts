@@ -235,6 +235,16 @@ export function hasHttp429Status(message = ''): boolean {
   );
 }
 
+export function isRateLimitOrQuotaMessage(errorMessage: string): boolean {
+  const lower = errorMessage.toLowerCase();
+  return (
+    lower.includes('rate limit') ||
+    lower.includes('quota exceeded') ||
+    lower.includes('too many requests') ||
+    hasHttp429Status(errorMessage)
+  );
+}
+
 export function isHardQuotaCode(code: string | undefined): boolean {
   return code !== undefined && HARD_QUOTA_ERROR_CODES.has(code);
 }

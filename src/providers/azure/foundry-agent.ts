@@ -10,6 +10,7 @@ import {
   extractRateLimitErrorType,
   formatRateLimitErrorMessage,
   HttpRateLimitError,
+  isRateLimitOrQuotaMessage,
 } from '../../util/fetch/errors';
 import {
   maybeLoadResponseFormatFromExternalFile,
@@ -30,12 +31,7 @@ import {
   withGenAISpan,
   withGenAIToolSpan,
 } from '../tracing';
-import {
-  formatContentFilterResponse,
-  isContentFilterError,
-  isRateLimitError,
-  isServiceError,
-} from './errors';
+import { formatContentFilterResponse, isContentFilterError, isServiceError } from './errors';
 import { AzureGenericProvider } from './generic';
 import { calculateAzureCost } from './util';
 import type { Agent, AIProjectClient as AzureAIProjectClient } from '@azure/ai-projects';
@@ -1294,7 +1290,7 @@ export class AzureFoundryAgentProvider extends AzureGenericProvider {
     let result: ProviderResponse;
     if (isContentFilterError(errorMessage)) {
       result = formatContentFilterResponse(errorMessage);
-    } else if (isRateLimitError(errorMessage)) {
+    } else if (isRateLimitOrQuotaMessage(errorMessage)) {
       result = { error: `Rate limit exceeded: ${errorMessage}` };
     } else if (isServiceError(errorMessage)) {
       result = { error: `Service error: ${errorMessage}` };

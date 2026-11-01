@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   formatContentFilterResponse,
   isContentFilterError,
-  isRateLimitError,
   isServiceError,
 } from '../../../src/providers/azure/errors';
+import { isRateLimitOrQuotaMessage } from '../../../src/util/fetch/errors';
 
 describe('isContentFilterError', () => {
   it.each([
@@ -26,7 +26,7 @@ describe('isContentFilterError', () => {
   });
 });
 
-describe('isRateLimitError', () => {
+describe('isRateLimitOrQuotaMessage', () => {
   it.each([
     'rate limit exceeded',
     'Rate limit reached',
@@ -36,7 +36,7 @@ describe('isRateLimitError', () => {
     'Request failed with status code 429.',
     'API error (429)',
   ])('matches %j', (msg) => {
-    expect(isRateLimitError(msg)).toBe(true);
+    expect(isRateLimitOrQuotaMessage(msg)).toBe(true);
   });
 
   it.each([
@@ -47,7 +47,7 @@ describe('isRateLimitError', () => {
     'Request ID: req-429-x',
     'some other error',
   ])('does not classify %j as a rate limit', (msg) => {
-    expect(isRateLimitError(msg)).toBe(false);
+    expect(isRateLimitOrQuotaMessage(msg)).toBe(false);
   });
 });
 

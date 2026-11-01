@@ -30,6 +30,15 @@ export interface RateLimitExecuteOptions<T> {
   canRetry?: () => boolean;
 }
 
+export function isRateLimitError(error: Error | undefined): boolean {
+  const message = error?.message?.toLowerCase() ?? '';
+  return (
+    hasHttp429Status(message) ||
+    message.includes('rate limit') ||
+    message.includes('too many requests')
+  );
+}
+
 /**
  * Default rate limit detection for ProviderResponse.
  *
@@ -84,9 +93,7 @@ export function isProviderResponseRateLimited(
       hasHttp429Status(responseError) ||
       responseError?.toLowerCase?.().includes?.('rate limit') ||
       // Check thrown error message
-      hasHttp429Status(error?.message) ||
-      error?.message?.toLowerCase().includes('rate limit') ||
-      error?.message?.toLowerCase().includes('too many requests'),
+      isRateLimitError(error),
   );
 }
 
