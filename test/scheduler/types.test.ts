@@ -54,6 +54,11 @@ describe('isProviderResponseRateLimited', () => {
       '{"statusCode":429,"message":"try later"}',
       'HTTP 200: model returned 429',
       'HTTP/2 429',
+      'API call error: Status RESOURCE_EXHAUSTED, Code 429, Message:\n\nPlease try again later.',
+      'Error 429: Please try again later.',
+      'API error 429: Please try again later.',
+      'PromptfooModel task API error: HTTP 429 upstream busy',
+      'OpenClaw tool invoke failed (429): upstream busy',
     ])('should detect a standalone 429 in returned and thrown errors: %s', (error) => {
       expect(isProviderResponseRateLimited({ error }, undefined)).toBe(true);
       expect(isProviderResponseRateLimited(undefined, new Error(error))).toBe(true);
@@ -63,6 +68,11 @@ describe('isProviderResponseRateLimited', () => {
       'HTTP 400: prompt is too long: 204291 tokens > 200000 maximum',
       'The model returned 429 tokens',
       'API error: 429 tokens exceed the context limit',
+      'Error: 429 tokens',
+      'Example API error: 429 tokens exceeds the maximum',
+      'Error 400: Invalid example: Error 429: retry later',
+      'API error 400: Unexpected API error 429: retry later',
+      'API call error: Status INVALID_ARGUMENT, Code 400, Message:\n\nUnexpected Code 429',
       'Request failed: req-429-x',
       'API error: 500 Internal Server Error (request_id: req_a4290f)',
       'Invalid value for max_tokens: 4290',

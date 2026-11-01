@@ -10,7 +10,9 @@ import {
   extractRateLimitErrorType,
   formatRateLimitErrorMessage,
   HttpRateLimitError,
+  isHardQuotaCode,
   isRateLimitOrQuotaMessage,
+  isTransientRateLimitCode,
 } from '../../util/fetch/errors';
 import {
   maybeLoadResponseFormatFromExternalFile,
@@ -989,7 +991,11 @@ export class AzureFoundryAgentProvider extends AzureGenericProvider {
           response.output_text && { output: response.output_text }),
         error: failure,
         raw: response,
-        metadata,
+        metadata: {
+          ...metadata,
+          ...(isTransientRateLimitCode(response.error?.code) && { rateLimitKind: 'rate_limit' }),
+          ...(isHardQuotaCode(response.error?.code) && { rateLimitKind: 'quota' }),
+        },
       };
     }
     if (result.error && response.output_text) {
