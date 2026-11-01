@@ -49,6 +49,11 @@ describe('isProviderResponseRateLimited', () => {
       'Request failed with status code 429.',
       'API error (429)',
       '{"error":{"code":429}}',
+      'API call error: Error: 429',
+      'API error: 429 {"message":"please retry"}',
+      '{"statusCode":429,"message":"try later"}',
+      'HTTP 200: model returned 429',
+      'HTTP/2 429',
     ])('should detect a standalone 429 in returned and thrown errors: %s', (error) => {
       expect(isProviderResponseRateLimited({ error }, undefined)).toBe(true);
       expect(isProviderResponseRateLimited(undefined, new Error(error))).toBe(true);
@@ -56,6 +61,9 @@ describe('isProviderResponseRateLimited', () => {
 
     it.each([
       'HTTP 400: prompt is too long: 204291 tokens > 200000 maximum',
+      'The model returned 429 tokens',
+      'API error: 429 tokens exceed the context limit',
+      'Request failed: req-429-x',
       'API error: 500 Internal Server Error (request_id: req_a4290f)',
       'Invalid value for max_tokens: 4290',
     ])('should preserve non-rate-limit returned and thrown errors: %s', (error) => {

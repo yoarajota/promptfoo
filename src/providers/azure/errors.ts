@@ -7,6 +7,8 @@
  * helpers used to be duplicated as private methods on each class; consolidating
  * them here keeps the substring matchers in one place.
  */
+import { hasHttp429Status } from '../../util/fetch/errors';
+
 import type { ProviderResponse } from '../../types/index';
 
 const CONTENT_FILTER_FALLBACK_MESSAGE =
@@ -25,17 +27,13 @@ export function isContentFilterError(errorMessage: string): boolean {
   );
 }
 
-// Word-bounded: a bare "429" substring also matches token counts and request
-// IDs, e.g. "resulted in 204291 tokens".
-const HTTP_429_RE = /\b429\b/;
-
 export function isRateLimitError(errorMessage: string): boolean {
   const lower = errorMessage.toLowerCase();
   return (
     lower.includes('rate limit') ||
     lower.includes('quota exceeded') ||
     lower.includes('too many requests') ||
-    HTTP_429_RE.test(errorMessage)
+    hasHttp429Status(errorMessage)
   );
 }
 

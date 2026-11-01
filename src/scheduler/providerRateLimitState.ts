@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 
+import { hasHttp429Status } from '../util/fetch/errors';
 import {
   createResponseHeadersObserver,
   isResponseHeadersObserverError,
@@ -458,7 +459,7 @@ export class ProviderRateLimitState extends EventEmitter {
   private isRateLimitError(error: Error): boolean {
     const message = (error.message ?? '').toLowerCase();
     return (
-      message.includes('429') ||
+      hasHttp429Status(message) ||
       message.includes('rate limit') ||
       message.includes('too many requests')
     );
